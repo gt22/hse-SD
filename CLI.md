@@ -1,5 +1,6 @@
 Команда: Энгель Игорь, Вавилов Марк
-Диаграммы: [первый этап](https://app.diagrams.net/#G1NCKTjDAzVfH0qoTYvEjekJihJgvRG-uT), [второй этап](https://app.diagrams.net/#G1scl4B9y2_bsXD_zG2miv4eju7DePTAo5)
+
+Диаграммы: по файлу на этап в репозитории
 
 ## Shell   
 `environment: Map<String, String>` -- набор переменных окружения  
