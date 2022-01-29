@@ -2,6 +2,6 @@ package com.hse
 
 
 fun main() {
-    val ctx = CommandContext()
+    val ctx = Shell()
     ctx.startShell()
 }

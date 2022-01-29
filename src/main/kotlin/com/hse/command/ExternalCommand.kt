@@ -11,7 +11,7 @@ class ExternalCommand(private val line: String) : AbstractCommand() {
         val process = Runtime.getRuntime().exec(line)
         process.waitFor()
         process.inputStream.use {
-            ctx.writer.println(String(it.readAllBytes()))
+            ctx.output.write(it.readAllBytes())
         }
     }
 }
