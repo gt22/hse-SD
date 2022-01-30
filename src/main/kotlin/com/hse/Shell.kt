@@ -12,11 +12,14 @@ class Shell(val input: InputStream = System.`in`, val output: OutputStream = Sys
     private val parser = Parser(simpleCommands)
 
     fun execute(line: String): Int {
-        val commandPipeline = parser.parseWithSubstitution(line)
+        val command = parser.parseWithSubstitution(line) ?: return 0
         val ctx = CommandContext(this, input, output)
-        commandPipeline.execute(ctx)
-
-        return 0
+        return try {
+            command.execute(ctx)
+        } catch(e: Exception) {
+            e.printStackTrace() //TODO: Better logging?
+            255
+        }
     }
 
     fun startShell() {

@@ -5,7 +5,7 @@ import com.hse.command.PreparedCommand
 import com.hse.command.SimpleCommand
 
 class Parser(private val simpleCommands: List<SimpleCommand>) {
-    fun parseWithSubstitution(line: String): CommandPipeline {
+    fun parseWithSubstitution(line: String): PreparedCommand? {
         val tokens = mutableListOf<String>()
 
         val newWord = StringBuilder()
@@ -43,9 +43,9 @@ class Parser(private val simpleCommands: List<SimpleCommand>) {
             tokens += newWord.toString()
         }
 
-        if (tokens.isEmpty()) return CommandPipeline(listOf())
+        if (tokens.isEmpty()) return null
 
-        val command = simpleCommands.firstOrNull { it.match(tokens) } ?: ExternalCommand(line)
-        return CommandPipeline(listOf(PreparedCommand(command, tokens.drop(1))))
+        val command = simpleCommands.firstOrNull { it.match(tokens) } ?: ExternalCommand(tokens[0])
+        return PreparedCommand(command, tokens.drop(1))
     }
 }

@@ -4,7 +4,8 @@ import com.hse.CommandContext
 import com.hse.command.SimpleCommand
 
 class CommandPWD : SimpleCommand("pwd") {
-    override fun execute(arguments: List<String>, ctx: CommandContext) {
+    override fun execute(arguments: List<String>, ctx: CommandContext): Int {
         ctx.writer.println(ctx.shell.workingDirectoryAbsolutePath.toString())
+        return 0
     }
 }

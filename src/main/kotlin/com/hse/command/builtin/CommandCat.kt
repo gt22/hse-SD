@@ -6,7 +6,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class CommandCat : SimpleCommand("cat") {
-    override fun execute(arguments: List<String>, ctx: CommandContext) {
+    override fun execute(arguments: List<String>, ctx: CommandContext): Int {
         if (arguments.isEmpty()) {
             ctx.input.transferTo(ctx.output)
         } else {
@@ -15,5 +15,6 @@ class CommandCat : SimpleCommand("cat") {
                 ctx.output.write(Files.readAllBytes(file))
             }
         }
+        return 0
     }
 }

@@ -6,7 +6,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class CommandWC : SimpleCommand("wc") {
-    override fun execute(arguments: List<String>, ctx: CommandContext) {
+    override fun execute(arguments: List<String>, ctx: CommandContext): Int {
         if (arguments.isEmpty()) {
             printWCForText(ctx, ctx.reader.readText(), "")
         }
@@ -14,6 +14,7 @@ class CommandWC : SimpleCommand("wc") {
             val file = ctx.shell.resolvePath(Paths.get(filename))
             printWCForText(ctx, Files.readString(file), filename)
         }
+        return 0
     }
 
     private fun printWCForText(ctx: CommandContext, text: String, filename: String) {
