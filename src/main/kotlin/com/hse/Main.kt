@@ -1,7 +1,18 @@
 package com.hse
 
+import com.hse.command.builtin.*
+
 
 fun main() {
-    val ctx = Shell()
+    val ctx = Shell(
+        listOf(
+            CommandCat(),
+            CommandEcho(),
+            CommandExit(),
+            CommandPWD(),
+            CommandWC(),
+            CommandSetEnviron()
+        )
+    )
     ctx.startShell()
 }

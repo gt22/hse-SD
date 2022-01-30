@@ -8,7 +8,7 @@ import java.nio.file.Paths
 class CommandWC : SimpleCommand("wc") {
     override fun execute(arguments: List<String>, ctx: CommandContext): Int {
         if (arguments.isEmpty()) {
-            printWCForText(ctx, ctx.reader.readText(), "")
+            printWCForText(ctx, ctx.reader.readText(), null)
         }
         for (filename in arguments) {
             val file = ctx.shell.resolvePath(Paths.get(filename))
@@ -17,7 +17,12 @@ class CommandWC : SimpleCommand("wc") {
         return 0
     }
 
-    private fun printWCForText(ctx: CommandContext, text: String, filename: String) {
-        ctx.writer.println("${text.lines().size} ${text.trim().split("\\s+".toRegex()).size} ${text.length} $filename")
+    private fun printWCForText(ctx: CommandContext, text: String, filename: String?) {
+        ctx.writer.print("${text.lines().size} ${text.trim().split("\\s+".toRegex()).size} ${text.length}")
+        if(filename != null) {
+            ctx.writer.print(" ")
+            ctx.writer.print(filename)
+        }
+        ctx.writer.println()
     }
 }

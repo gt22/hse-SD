@@ -8,14 +8,10 @@ import java.io.ByteArrayOutputStream
 internal class CommandPWDTest {
     @Test
     fun execute() {
-        val input = "".byteInputStream()
-        val outputStream = ByteArrayOutputStream()
-        val shell = Shell(input, outputStream)
-        shell.execute("pwd")
+        val result = testCommand { ctx ->
+            CommandPWD().execute("pwd", emptyList(), ctx)
+        }
         val path = System.getProperty("user.dir")
-
-        assertEquals(
-            path + System.lineSeparator(), outputStream.toString()
-        )
+        assertEquals(path, result)
     }
 }

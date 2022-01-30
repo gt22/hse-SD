@@ -15,6 +15,7 @@ class ExternalCommand : AbstractCommand() {
                 redirectError(ProcessBuilder.Redirect.INHERIT)
                 environment().putAll(ctx.shell.environment)
             }.start()
+        // TODO: Pass input to the process
         process.waitFor()
         process.inputStream.use {
             it.transferTo(ctx.output)

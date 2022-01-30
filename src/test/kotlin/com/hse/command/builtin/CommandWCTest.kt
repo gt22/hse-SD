@@ -10,11 +10,9 @@ internal class CommandWCTest {
 
     @Test
     fun execute() {
-        val input = "".byteInputStream()
-        val outputStream = ByteArrayOutputStream()
-        val shell = Shell(input, outputStream)
-        val fileName = "src/test/resources/testFile.txt"
-        shell.execute("wc $fileName")
-        Assertions.assertEquals("3 4 8 $fileName" + System.lineSeparator(), outputStream.toString())
+        val result = testCommand(javaClass.getResourceAsStream("/testFile.txt")!!) { ctx ->
+            CommandWC().execute("wc", emptyList(), ctx)
+        }
+        Assertions.assertEquals("3 4 8", result)
     }
 }
