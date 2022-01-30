@@ -2,7 +2,7 @@ package com.hse.command.builtin
 
 import com.hse.CommandContext
 import com.hse.command.SimpleCommand
-import com.hse.writeln
+import java.nio.file.Files
 import java.nio.file.Paths
 
 class CommandCat : SimpleCommand("cat") {
@@ -11,8 +11,8 @@ class CommandCat : SimpleCommand("cat") {
             ctx.input.transferTo(ctx.output)
         } else {
             for (argument in arguments) {
-                val file = ctx.shell.resolvePath(Paths.get(argument)).toFile()
-                ctx.output.writeln(file.readBytes())
+                val file = ctx.shell.resolvePath(Paths.get(argument))
+                ctx.output.write(Files.readAllBytes(file))
             }
         }
     }
