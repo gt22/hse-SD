@@ -7,6 +7,6 @@ import java.io.PrintWriter
 class CommandContext(val shell: Shell, val input: InputStream, val output: OutputStream) {
 
     val reader by lazy { input.bufferedReader() }
-    val writer by lazy { PrintWriter(output) }
+    val writer by lazy { PrintWriter(output, true) }
 
 }

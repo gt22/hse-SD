@@ -16,6 +16,8 @@ class Shell(val input: InputStream = System.`in`, val output: OutputStream = Sys
         val ctx = CommandContext(this, input, output)
         return try {
             command.execute(ctx)
+        } catch (e: ExitException) {
+            throw e
         } catch(e: Exception) {
             e.printStackTrace() //TODO: Better logging?
             255
