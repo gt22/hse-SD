@@ -14,5 +14,7 @@ fun testCommand(input: InputStream, expectedExitCode: Int = 0, act: (CommandCont
     return output.toString().removeSuffix(System.lineSeparator())
 }
 
+val ln = System.lineSeparator()
+
 fun testCommand(input: String = "", expectedExitCode: Int = 0, act: (CommandContext) -> Int)
     = testCommand(input.byteInputStream(), expectedExitCode, act)

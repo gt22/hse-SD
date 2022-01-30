@@ -9,6 +9,6 @@ internal class CommandCatTest {
         val result = testCommand(javaClass.getResourceAsStream("/testFile.txt")!!) { ctx ->
             CommandCat().execute("cat", emptyList(), ctx)
         }
-        assertEquals("1 2" + System.lineSeparator() + "3 4", result)
+        assertEquals("1 2${ln}3 4", result)
     }
 }
