@@ -1,5 +1,6 @@
 package com.hse
 
+import com.hse.command.ExternalCommand
 import com.hse.command.builtin.*
 import java.io.InputStream
 import java.io.OutputStream
@@ -8,7 +9,7 @@ import java.nio.file.Paths
 
 class Shell(val input: InputStream = System.`in`, val output: OutputStream = System.out) {
     val environment: MutableMap<String, String> = mutableMapOf()
-    private val builtinCommands = listOf(CommandCat(), CommandEcho(), CommandExit(), CommandPWD(), CommandWC())
+    private val builtinCommands = listOf(CommandCat(), CommandEcho(), CommandExit(), CommandPWD(), CommandWC(), CommandSetEnviron(), ExternalCommand())
     private val parser = Parser(builtinCommands)
 
     fun execute(line: String): Int {
