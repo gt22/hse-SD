@@ -3,9 +3,7 @@ package com.hse.command
 import com.hse.CommandContext
 
 class ExternalCommand(private val line: String) : AbstractCommand() {
-    override fun match(cmd: List<String>): Boolean {
-        return true
-    }
+    override fun match(cmd: List<String>) = true
 
     override fun execute(arguments: List<String>, ctx: CommandContext): Int {
         val process = Runtime.getRuntime().exec(line)

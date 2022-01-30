@@ -8,8 +8,8 @@ import java.nio.file.Paths
 
 class Shell(val input: InputStream = System.`in`, val output: OutputStream = System.out) {
 //    val environment: Map<String, String> = mapOf()
-    val simpleCommands = listOf(CommandCat(), CommandEcho(), CommandExit(), CommandPWD(), CommandWC())
-    private val parser = Parser(simpleCommands)
+    private val builtinCommands = listOf(CommandCat(), CommandEcho(), CommandExit(), CommandPWD(), CommandWC())
+    private val parser = Parser(builtinCommands)
 
     fun execute(line: String): Int {
         val command = parser.parseWithSubstitution(line) ?: return 0
