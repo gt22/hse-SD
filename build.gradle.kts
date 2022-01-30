@@ -18,6 +18,13 @@ dependencies {
 }
 
 
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+}
+
 application {
     mainClass.set("com.hse.MainKt")
 }
