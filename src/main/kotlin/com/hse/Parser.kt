@@ -45,7 +45,7 @@ class Parser(private val builtinCommands: List<SimpleCommand>) {
 
         if (tokens.isEmpty()) return null
 
-        val command = builtinCommands.firstOrNull { it.match(tokens) } ?: ExternalCommand(tokens[0])
-        return PreparedCommand(command, tokens.drop(1))
+        val command = builtinCommands.firstOrNull { it.match(tokens) } ?: ExternalCommand()
+        return PreparedCommand(command, tokens[0], tokens.drop(1))
     }
 }

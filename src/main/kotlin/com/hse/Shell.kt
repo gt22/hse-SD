@@ -7,7 +7,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 class Shell(val input: InputStream = System.`in`, val output: OutputStream = System.out) {
-//    val environment: Map<String, String> = mapOf()
+    val environment: MutableMap<String, String> = mutableMapOf()
     private val builtinCommands = listOf(CommandCat(), CommandEcho(), CommandExit(), CommandPWD(), CommandWC())
     private val parser = Parser(builtinCommands)
 
