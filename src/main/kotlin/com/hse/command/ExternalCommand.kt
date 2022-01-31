@@ -1,6 +1,8 @@
 package com.hse.command
 
 import com.hse.CommandContext
+import java.io.IOException
+import kotlin.concurrent.thread
 
 class ExternalCommand : AbstractCommand() {
     override fun match(cmd: List<String>) = true
@@ -15,7 +17,12 @@ class ExternalCommand : AbstractCommand() {
                 redirectError(ProcessBuilder.Redirect.INHERIT)
                 environment().putAll(ctx.shell.environment)
             }.start()
-        // TODO: Pass input to the process
+        try {
+            ctx.input.transferTo(process.outputStream)
+            process.outputStream.close()
+        } catch(e: IOException) {
+            //no-op
+        }
         process.waitFor()
         process.inputStream.use {
             it.transferTo(ctx.output)
