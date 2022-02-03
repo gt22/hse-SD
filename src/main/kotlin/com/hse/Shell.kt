@@ -1,7 +1,6 @@
 package com.hse
 
 import com.hse.command.AbstractCommand
-import com.hse.command.ExternalCommand
 import com.hse.command.builtin.*
 import java.io.InputStream
 import java.io.OutputStream
@@ -17,7 +16,7 @@ class Shell(
     private val parser = Parser(builtinCommands)
 
     fun execute(line: String): Int {
-        val command = parser.parseWithSubstitution(line) ?: return 0
+        val command = parser.parseWithSubstitution(line, environment) ?: return 0
         val ctx = CommandContext(this, input, output)
         return try {
             command.execute(ctx)
