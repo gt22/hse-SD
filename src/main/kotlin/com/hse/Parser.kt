@@ -1,6 +1,7 @@
 package com.hse
 
 import com.hse.command.AbstractCommand
+import com.hse.command.ExternalCommand
 import com.hse.command.PreparedCommand
 
 class Parser(private val commandsList: List<AbstractCommand>) {
@@ -44,7 +45,7 @@ class Parser(private val commandsList: List<AbstractCommand>) {
 
         if (tokens.isEmpty()) return null
 
-        val command = commandsList.first { it.match(tokens) }
+        val command = commandsList.firstOrNull { it.match(tokens) } ?: ExternalCommand()
         return PreparedCommand(command, tokens[0], tokens.drop(1))
     }
 }
