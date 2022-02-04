@@ -19,9 +19,7 @@ class Parser(private val commandsList: List<AbstractCommand>) {
                 currentPosition++
             }
             newWord.append(
-                if (variableName.isNotEmpty())
-                    environment.get(variableName.toString()) ?: ""
-                else '$'
+                environment[variableName.toString()] ?: ""
             )
         }
 
