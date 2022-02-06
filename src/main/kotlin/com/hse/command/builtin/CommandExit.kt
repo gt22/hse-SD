@@ -4,6 +4,7 @@ import com.hse.CommandContext
 import com.hse.command.SimpleCommand
 
 class CommandExit : SimpleCommand("exit") {
+    // exits from shell
     override fun execute(arguments: List<String>, ctx: CommandContext) = throw ExitException()
 }
 

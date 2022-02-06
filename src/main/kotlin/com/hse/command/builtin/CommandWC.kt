@@ -6,6 +6,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class CommandWC : SimpleCommand("wc") {
+    // counts number of lines, words and characters in given files or given input
     override fun execute(arguments: List<String>, ctx: CommandContext): Int {
         if (arguments.isEmpty()) {
             printWCForText(ctx, ctx.reader.readText(), null)

@@ -6,6 +6,7 @@ import com.hse.command.AbstractCommand
 class CommandSetEnviron : AbstractCommand() {
     override fun match(cmd: List<String>) = cmd.size == 1 && cmd[0].contains('=')
 
+    // adds sets value to the variable
     override fun execute(command: String, arguments: List<String>, ctx: CommandContext): Int {
         val parts = command.split('=')
         ctx.shell.environment[parts[0]] = parts[1]

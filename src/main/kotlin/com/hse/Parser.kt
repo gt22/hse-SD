@@ -4,6 +4,8 @@ import com.hse.command.AbstractCommand
 import com.hse.command.PreparedCommand
 
 class Parser(private val commandsList: List<AbstractCommand>) {
+    // takes line as input
+    // removes quotes, splits line to tokens
     fun parseWithSubstitution(line: String): PreparedCommand? {
         val tokens = mutableListOf<String>()
 

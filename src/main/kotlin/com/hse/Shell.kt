@@ -1,8 +1,7 @@
 package com.hse
 
 import com.hse.command.AbstractCommand
-import com.hse.command.ExternalCommand
-import com.hse.command.builtin.*
+import com.hse.command.builtin.ExitException
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Path
@@ -16,6 +15,7 @@ class Shell(
     val environment: MutableMap<String, String> = mutableMapOf()
     private val parser = Parser(builtinCommands)
 
+    // executes given line
     fun execute(line: String): Int {
         val command = parser.parseWithSubstitution(line) ?: return 0
         val ctx = CommandContext(this, input, output)
@@ -29,6 +29,8 @@ class Shell(
         }
     }
 
+    // starts reading input
+    // passes every line to execute function
     fun startShell() {
         input.bufferedReader().use { reader ->
             while (true) {
