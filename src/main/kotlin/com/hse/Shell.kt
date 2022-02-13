@@ -16,10 +16,10 @@ class Shell(
     private val parser = Parser(builtinCommands)
 
     fun execute(line: String): Int {
-        val command = parser.parseWithSubstitution(line, environment) ?: return 0
+        val pipeline = parser.parseWithSubstitution(line, environment) ?: return 0
         val ctx = CommandContext(this, input, output)
         return try {
-            command.execute(ctx)
+            pipeline.execute(ctx)
         } catch (e: ExitException) {
             throw e
         } catch(e: Exception) {

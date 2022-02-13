@@ -5,7 +5,8 @@ import com.hse.command.ExternalCommand
 import com.hse.command.PreparedCommand
 
 class Parser(private val commandsList: List<AbstractCommand>) {
-    fun parseWithSubstitution(line: String, environment: MutableMap<String, String>): PreparedCommand? {
+    fun parseWithSubstitution(line: String, environment: MutableMap<String, String>): CommandPipeline {
+        val pipeline = mutableListOf<PreparedCommand>()
         val tokens = mutableListOf<String>()
 
         val newWord = StringBuilder()
@@ -55,19 +56,32 @@ class Parser(private val commandsList: List<AbstractCommand>) {
                 '$' -> {
                     parseVariable()
                 }
+                '|' -> {
+                    addCommandToPipeline(newWord, tokens, pipeline)
+                    currentPosition++
+                }
                 else -> {
                     newWord.append(line[currentPosition++])
                 }
             }
         }
+        addCommandToPipeline(newWord, tokens, pipeline)
+        return CommandPipeline(pipeline)
+    }
 
+    private fun addCommandToPipeline(
+        newWord: StringBuilder,
+        tokens: MutableList<String>,
+        pipeline: MutableList<PreparedCommand>
+    ) {
         if (newWord.isNotEmpty()) {
             tokens += newWord.toString()
         }
-
-        if (tokens.isEmpty()) return null
-
+        if (tokens.isEmpty()) return
+        newWord.clear()
         val command = commandsList.firstOrNull { it.match(tokens) } ?: ExternalCommand()
-        return PreparedCommand(command, tokens[0], tokens.drop(1))
+        val prepared = PreparedCommand(command, tokens[0], tokens.drop(1))
+        tokens.clear()
+        pipeline.add(prepared)
     }
 }
