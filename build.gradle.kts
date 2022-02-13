@@ -1,10 +1,11 @@
 plugins {
     kotlin("jvm") version "1.5.10"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     application
 }
 
 group = "org.example"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 repositories {
     mavenCentral()
@@ -17,7 +18,6 @@ dependencies {
     implementation("junit:junit:4.12")
 }
 
-
 tasks.test {
     useJUnitPlatform()
     testLogging {
@@ -27,4 +27,10 @@ tasks.test {
 
 application {
     mainClass.set("com.hse.MainKt")
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = application.mainClass
+    }
 }
