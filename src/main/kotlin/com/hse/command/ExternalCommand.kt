@@ -11,22 +11,33 @@ class ExternalCommand : AbstractCommand() {
         val cmd = ArrayList<String>(arguments.size + 1)
         cmd.add(command)
         cmd.addAll(arguments)
-        val process =
-            ProcessBuilder(cmd).apply {
-                directory(ctx.shell.workingDirectoryAbsolutePath.toFile())
-                redirectError(ProcessBuilder.Redirect.INHERIT)
-                environment().putAll(ctx.shell.environment)
-            }.start()
         try {
-            ctx.input.transferTo(process.outputStream)
+            val process =
+                ProcessBuilder(cmd).apply {
+                    directory(ctx.shell.workingDirectoryAbsolutePath.toFile())
+                    redirectError(ProcessBuilder.Redirect.INHERIT)
+                    if (ctx.input == System.`in`) {
+                        redirectInput(ProcessBuilder.Redirect.INHERIT)
+                    }
+                    environment().putAll(ctx.shell.environment)
+                }.start()
+            if(ctx.input != System.`in`) {
+                try {
+                    ctx.input.transferTo(process.outputStream)
+                    process.outputStream.close()
+                } catch (e: IOException) {
+                    println("IOE")
+                    //no-op
+                }
+            }
+            process.waitFor()
             process.outputStream.close()
-        } catch(e: IOException) {
-            //no-op
+            process.inputStream.use {
+                it.transferTo(ctx.output)
+            }
+            return process.exitValue()
+        } catch (e: IOException) {
+            return 120
         }
-        process.waitFor()
-        process.inputStream.use {
-            it.transferTo(ctx.output)
-        }
-        return process.exitValue()
     }
 }
