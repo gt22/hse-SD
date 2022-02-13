@@ -2,9 +2,11 @@ package com.hse.command
 
 import com.hse.CommandContext
 import java.io.IOException
-import kotlin.concurrent.thread
 
-class ExternalCommand : AbstractCommand() {
+/**
+ * Внешняя команда - запускает команду как системную
+ */
+class ExternalCommand : ICommand {
     override fun match(cmd: List<String>) = true
 
     override fun execute(command: String, arguments: List<String>, ctx: CommandContext): Int {

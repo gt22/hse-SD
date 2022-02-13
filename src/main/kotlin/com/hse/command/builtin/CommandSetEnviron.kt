@@ -1,9 +1,9 @@
 package com.hse.command.builtin
 
 import com.hse.CommandContext
-import com.hse.command.AbstractCommand
+import com.hse.command.ICommand
 
-class CommandSetEnviron : AbstractCommand() {
+class CommandSetEnviron : ICommand {
     override fun match(cmd: List<String>) = cmd.size == 1 && cmd[0].contains('=')
 
     override fun execute(command: String, arguments: List<String>, ctx: CommandContext): Int {

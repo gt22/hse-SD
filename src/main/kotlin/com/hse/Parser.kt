@@ -1,10 +1,19 @@
 package com.hse
 
-import com.hse.command.AbstractCommand
+import com.hse.command.ICommand
 import com.hse.command.ExternalCommand
 import com.hse.command.PreparedCommand
 
-class Parser(private val commandsList: List<AbstractCommand>) {
+/**
+ * Парсер отвечающий за разбор строк на команды
+ * @param commandsList - список встроенных команд, при разборе выбирается первая подходящая, если таких нет - [ExternalCommand]
+ */
+class Parser(private val commandsList: List<ICommand>) {
+
+    /**
+     * Разбирает строку на набор команд, с учётом подстановок (@todo - вторая часть задания)
+     * @return `null` если не получилось ни одного токена, команду с аргументами иначе
+     */
     fun parseWithSubstitution(line: String): PreparedCommand? {
         val tokens = mutableListOf<String>()
 

@@ -1,22 +1,27 @@
 package com.hse
 
-import com.hse.command.AbstractCommand
-import com.hse.command.ExternalCommand
+import com.hse.command.ICommand
 import com.hse.command.builtin.*
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Path
 import java.nio.file.Paths
 
+/**
+ * Основной класс CLI, хранит переменные среды и рабочую директорию
+ * @param builtinCommands - встроенные команды, см. [Parser]
+ * @param input - основной поток ввода
+ * @param output - основной поток вывода
+ */
 class Shell(
-    private val builtinCommands: List<AbstractCommand>,
+    builtinCommands: List<ICommand>,
     val input: InputStream = System.`in`,
     val output: OutputStream = System.out
 ) {
     val environment: MutableMap<String, String> = mutableMapOf()
     private val parser = Parser(builtinCommands)
 
-    fun execute(line: String): Int {
+    private fun execute(line: String): Int {
         val command = parser.parseWithSubstitution(line) ?: return 0
         val ctx = CommandContext(this, input, output)
         return try {
@@ -29,6 +34,9 @@ class Shell(
         }
     }
 
+    /**
+     * Запускает главный цикл CLI
+     */
     fun startShell() {
         input.bufferedReader().use { reader ->
             while (true) {
@@ -45,5 +53,10 @@ class Shell(
     }
 
     val workingDirectoryAbsolutePath: Path = Paths.get("").toAbsolutePath()
+
+    /**
+     * Возвращает путь с учётом рабочей директории
+     * Не изменяет абсолютные пути
+     */
     fun resolvePath(path: Path): Path = if (path.isAbsolute) path else workingDirectoryAbsolutePath.resolve(path)
 }
