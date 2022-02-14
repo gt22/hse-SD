@@ -8,7 +8,7 @@ import java.io.PipedOutputStream
 /**
  * Набор команд для последовательного исполнения, где вывод одной команды является вводом следующей.
  */
-class CommandPipeline(private val commands: List<PreparedCommand>) {
+data class CommandPipeline(private val commands: List<PreparedCommand>) {
 
     /**
      * Последовательно запускает команды в пайплайне, и обеспечивает корректную передачу ввода/вывода между ними
