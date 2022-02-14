@@ -83,12 +83,13 @@ class Parser(
 
     private fun attemptSubstitution(s: String): String {
         var res = s
-        "\\$([a-zA-Z]+)".toRegex().findAll(s).forEach { m ->
+        var start = 0
+        while(true) {
+            val m = "\\$([a-zA-Z_][a-zA-Z_\\d]*)".toRegex().find(res, start) ?: break
             val env = m.groupValues[1]
-            res = s.replaceRange(
-                m.range,
-                shell.environment.getOrDefault(env, System.getenv(env) ?: "")
-            )
+            val value = shell.environment.getOrDefault(env, System.getenv(env) ?: "")
+            res = res.replaceRange(m.range, value)
+            start = m.range.first + value.length
         }
         return res
     }
