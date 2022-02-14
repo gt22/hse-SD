@@ -19,10 +19,15 @@ class Shell(
     val output: OutputStream = System.out
 ) {
     val environment: MutableMap<String, String> = mutableMapOf()
-    private val parser = Parser(builtinCommands)
+    private val parser = Parser(this, builtinCommands)
 
     private fun execute(line: String): Int {
-        val command = parser.parseWithSubstitution(line) ?: return 0
+        val command = try {
+            parser.parseWithSubstitution(line) ?: return 0
+        } catch (e: IllegalArgumentException) {
+            output.write("Parse error: ${e.message}\n".toByteArray())
+            return 130
+        }
         val ctx = CommandContext(this, input, output)
         return try {
             command.execute(ctx)

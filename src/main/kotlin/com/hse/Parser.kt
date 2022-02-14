@@ -1,32 +1,54 @@
 package com.hse
 
+import com.hse.command.CommandPipeline
 import com.hse.command.ICommand
 import com.hse.command.ExternalCommand
 import com.hse.command.PreparedCommand
 
 /**
  * Парсер отвечающий за разбор строк на команды
+ * @param shell - Шелл для доспута к переменным среды
  * @param commandsList - список встроенных команд, при разборе выбирается первая подходящая, если таких нет - [ExternalCommand]
  */
-class Parser(private val commandsList: List<ICommand>) {
+class Parser(
+    private val shell: Shell,
+    private val commandsList: List<ICommand>
+    ) {
 
     /**
-     * Разбирает строку на набор команд, с учётом подстановок (@todo - вторая часть задания)
+     * Разбирает строку на набор команд, с учётом подстановок
      * @return `null` если не получилось ни одного токена, команду с аргументами иначе
      */
-    fun parseWithSubstitution(line: String): PreparedCommand? {
+    fun parseWithSubstitution(line: String): CommandPipeline? {
+        val commands = mutableListOf<PreparedCommand>()
         val tokens = mutableListOf<String>()
 
         val newWord = StringBuilder()
+        val tokenSegments = mutableListOf<String>()
         // null => no quote yet
         var openedQuote: Char?
         var currentPosition = 0
-        while (currentPosition < line.length) {
-            when (line[currentPosition]) {
-                ' ' -> {
+        while (currentPosition <= line.length) {
+            when (val c = if(currentPosition < line.length) line[currentPosition] else ' ') {
+                ' ', '|' -> {
                     if (newWord.isNotEmpty()) {
-                        tokens += newWord.toString()
+                        tokenSegments += attemptSubstitution(newWord.toString())
                         newWord.clear()
+                    }
+                    if(tokenSegments.isNotEmpty()) {
+                        tokens += tokenSegments.joinToString("")
+                        tokenSegments.clear()
+                    }
+                    if(c == '|' && currentPosition == line.length) {
+                        throw IllegalArgumentException("Tail pipe is not allowed")
+                    }
+                    if(c == '|' || currentPosition == line.length) {
+                        if(tokens.isEmpty()) {
+                            throw IllegalArgumentException("Empty command")
+                        }
+                        val command = commandsList.firstOrNull { it.match(tokens) } ?: ExternalCommand()
+                        commands += PreparedCommand(command, tokens[0], tokens.drop(1))
+                        tokens.clear()
                     }
                     currentPosition++
                     continue
@@ -38,6 +60,12 @@ class Parser(private val commandsList: List<ICommand>) {
                     }
                     if (currentPosition < line.length && line[currentPosition] == openedQuote) {
                         currentPosition++
+                        tokenSegments += if(openedQuote == '\'') {
+                            newWord.toString()
+                        } else {
+                            attemptSubstitution(newWord.toString())
+                        }
+                        newWord.clear()
                     } else if (currentPosition == line.length) {
                         throw IllegalArgumentException("There is an unmatched quote")
                     }
@@ -48,13 +76,20 @@ class Parser(private val commandsList: List<ICommand>) {
             }
         }
 
-        if (newWord.isNotEmpty()) {
-            tokens += newWord.toString()
+        if (commands.isEmpty()) return null
+
+        return CommandPipeline(commands)
+    }
+
+    private fun attemptSubstitution(s: String): String {
+        var res = s
+        "\\$([a-zA-Z]+)".toRegex().findAll(s).forEach { m ->
+            val env = m.groupValues[1]
+            res = s.replaceRange(
+                m.range,
+                shell.environment.getOrDefault(env, System.getenv(env) ?: "")
+            )
         }
-
-        if (tokens.isEmpty()) return null
-
-        val command = commandsList.firstOrNull { it.match(tokens) } ?: ExternalCommand()
-        return PreparedCommand(command, tokens[0], tokens.drop(1))
+        return res
     }
 }
