@@ -11,6 +11,7 @@ fun main() {
             CommandExit(),
             CommandPWD(),
             CommandWC(),
+            CommandGrep(),
             CommandSetEnviron()
         )
     )
