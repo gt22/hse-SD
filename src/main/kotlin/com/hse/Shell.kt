@@ -5,7 +5,7 @@ import com.hse.command.builtin.*
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Path
-import java.nio.file.Paths
+import kotlin.io.path.absolute
 
 /**
  * Основной класс CLI, хранит переменные среды и рабочую директорию
@@ -18,8 +18,12 @@ class Shell(
     val input: InputStream = System.`in`,
     val output: OutputStream = System.out
 ) {
-    val environment: MutableMap<String, String> = mutableMapOf()
+    val environment: MutableMap<String, String> = System.getenv().toMutableMap()
     private val parser = Parser(this, builtinCommands)
+
+    init {
+        environment[KEY_WD] = Path.of(environment[KEY_WD] ?: ".").absolute().normalize().toString()
+    }
 
     private fun execute(line: String): Int {
         val command = try {
@@ -33,7 +37,7 @@ class Shell(
             command.execute(ctx)
         } catch (e: ExitException) {
             throw e
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace() //TODO: Better logging?
             255
         }
@@ -57,11 +61,19 @@ class Shell(
         }
     }
 
-    val workingDirectoryAbsolutePath: Path = Paths.get("").toAbsolutePath()
+    var workingDirectoryAbsolutePath: Path
+        get() = Path.of(environment[KEY_WD]!!)
+        set(newPath) {
+            environment[KEY_WD] = newPath.absolute().normalize().toString()
+        }
 
     /**
      * Возвращает путь с учётом рабочей директории
      * Не изменяет абсолютные пути
      */
     fun resolvePath(path: Path): Path = if (path.isAbsolute) path else workingDirectoryAbsolutePath.resolve(path)
+
+    companion object {
+        private const val KEY_WD = "PWD"
+    }
 }
