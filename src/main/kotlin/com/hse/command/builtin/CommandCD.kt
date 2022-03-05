@@ -16,13 +16,13 @@ class CommandCD : SimpleCommand("cd") {
             ctx.writer.println("cd: too many arguments")
             return 1
         }
-        val path = Path.of(arguments.firstOrNull() ?: System.getProperty("user.home"))
-        val newPath = ctx.shell.workingDirectoryAbsolutePath.resolve(path)
+        val diffPath = Path.of(arguments.firstOrNull() ?: System.getProperty("user.home"))
+        val newPath = ctx.shell.workingDirectoryAbsolutePath.resolve(diffPath)
         if (!newPath.isDirectory()) {
-            ctx.writer.println("cd: $path: No such directory")
+            ctx.writer.println("cd: $diffPath: No such directory")
             return 1
         }
-        ctx.shell.workingDirectoryAbsolutePath = ctx.shell.workingDirectoryAbsolutePath.resolve(path)
+        ctx.shell.workingDirectoryAbsolutePath = newPath
         return 0
     }
 }
