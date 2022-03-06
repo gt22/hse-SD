@@ -8,6 +8,7 @@
 `environment: Map<String, String>` - набор переменных окружения  
 
 `fun execute(line: String): Int` - с помощью `parser` преобразует поданную на вход строку в `CommandPipeline`, создаёт базовый контекст (на основе stdin/stdout) и вызывает `execute`.
+`workingDirectoryAbsolutePath` -- текущая рабочая директория, один из элементов состояния `shell`  
 
 ## Parser
 Класс отвечающий за разбиение строки на команды
