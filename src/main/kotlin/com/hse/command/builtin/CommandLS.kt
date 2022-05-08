@@ -27,7 +27,7 @@ class CommandLS : SimpleCommand("ls") {
         } else if (path.isRegularFile()) {
             arguments[0]
         } else {
-            ctx.writer.println("cd: ${path.fileName}: No such directory")
+            ctx.writer.println("ls: ${path.fileName}: No such directory")
             return 1
         }
         ctx.writer.println(content)

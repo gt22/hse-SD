@@ -12,8 +12,8 @@ import kotlin.io.path.createTempDirectory
 import org.junit.jupiter.api.Assertions.assertEquals
 
 internal class CommandLSTest {
-    private  val tmpDirName = "tmpDirWithUniqName"
-    private  val subDirName = "subDir"
+    private val tmpDirName = "tmpDirWithUniqName"
+    private val subDirName = "subDir"
     private val filesInTempDir = listOf("file")
     private val subDirsInTempDir = listOf(subDirName)
     private val filesInSubDir = listOf("fileInSubDir")
@@ -42,7 +42,7 @@ internal class CommandLSTest {
             CommandCD().execute("cd", listOf(System.getProperty("user.dir")), ctx)
             CommandCD().execute("cd", listOf(tmpDirName), ctx)
             val rv = CommandLS().execute("ls", emptyList(), ctx)
-            CommandCD().execute("cd", listOf("../"), ctx)
+            CommandCD().execute("cd", listOf("..${File.separator}"), ctx)
             return@testCommand rv
         }
         assertEquals((filesInTempDir + subDirsInTempDir).sortedBy { it.lowercase() }, result.lines())
@@ -54,7 +54,7 @@ internal class CommandLSTest {
             CommandCD().execute("cd", listOf(System.getProperty("user.dir")), ctx)
             CommandCD().execute("cd", listOf(tmpDirName), ctx)
             val rv = CommandLS().execute("ls", listOf(subDirName), ctx)
-            CommandCD().execute("cd", listOf("../"), ctx)
+            CommandCD().execute("cd", listOf("..${File.separator}"), ctx)
             return@testCommand rv
         }
         assertEquals(filesInSubDir.sortedBy { it.lowercase() }, result.lines())
@@ -67,10 +67,10 @@ internal class CommandLSTest {
             CommandCD().execute("cd", listOf(System.getProperty("user.dir")), ctx)
             CommandCD().execute("cd", listOf(tmpDirName), ctx)
             val rv = CommandLS().execute("ls", listOf(notExistDirName), ctx)
-            CommandCD().execute("cd", listOf("../"), ctx)
+            CommandCD().execute("cd", listOf("..${File.separator}"), ctx)
             return@testCommand rv
         }
-        assertEquals("cd: $notExistDirName: No such directory", result)
+        assertEquals("ls: $notExistDirName: No such directory", result)
     }
 
     @Test
@@ -79,7 +79,7 @@ internal class CommandLSTest {
             CommandCD().execute("cd", listOf(System.getProperty("user.dir")), ctx)
             CommandCD().execute("cd", listOf(tmpDirName), ctx)
             val rv = CommandLS().execute("ls", listOf(filesInTempDir[0]), ctx)
-            CommandCD().execute("cd", listOf("../"), ctx)
+            CommandCD().execute("cd", listOf("..${File.separator}"), ctx)
             return@testCommand rv
         }
         assertEquals(filesInTempDir[0], result)
@@ -91,9 +91,60 @@ internal class CommandLSTest {
             CommandCD().execute("cd", listOf(System.getProperty("user.dir")), ctx)
             CommandCD().execute("cd", listOf(tmpDirName), ctx)
             val rv = CommandLS().execute("ls", listOf(filesInTempDir[0], "second argument"), ctx)
-            CommandCD().execute("cd", listOf("../"), ctx)
+            CommandCD().execute("cd", listOf("..${File.separator}"), ctx)
             return@testCommand rv
         }
         assertEquals("ls: too many arguments", result)
+    }
+
+    @Test
+    fun `test double dots argument`() {
+        val result = testCommand { ctx ->
+            CommandCD().execute("cd", listOf(System.getProperty("user.dir")), ctx)
+            CommandCD().execute("cd", listOf("$tmpDirName${File.separator}$subDirName"), ctx)
+            val rv = CommandLS().execute("ls", listOf(".."), ctx)
+            CommandCD().execute("cd", listOf("..${File.separator}"), ctx)
+            return@testCommand rv
+        }
+        assertEquals((filesInTempDir + subDirsInTempDir).sortedBy { it.lowercase() }, result.lines())
+    }
+
+    @Test
+    fun `test full path argument `() {
+        val result = testCommand { ctx ->
+            val rv = CommandLS().execute(
+                "ls",
+                listOf("${System.getProperty("user.dir")}${File.separator}${tmpDirName}"),
+                ctx
+            )
+            return@testCommand rv
+        }
+        assertEquals((filesInTempDir + subDirsInTempDir).sortedBy { it.lowercase() }, result.lines())
+    }
+
+    @Test
+    fun `test double dots slash path`() {
+        val result = testCommand { ctx ->
+            CommandCD().execute("cd", listOf(System.getProperty("user.dir")), ctx)
+            CommandCD().execute("cd", listOf(tmpDirName), ctx)
+            CommandCD().execute("cd", listOf(subDirName), ctx)
+            val rv = CommandLS().execute("ls", listOf("..${File.separator}"), ctx)
+            CommandCD().execute("cd", listOf("..${File.separator}"), ctx)
+            return@testCommand rv
+        }
+        assertEquals((filesInTempDir + subDirsInTempDir).sortedBy { it.lowercase() }, result.lines())
+    }
+
+    @Test
+    fun `test path with many slashes at the end`() {
+        val result = testCommand { ctx ->
+            CommandCD().execute("cd", listOf(System.getProperty("user.dir")), ctx)
+            CommandCD().execute("cd", listOf(tmpDirName), ctx)
+            val rv =
+                CommandLS().execute("ls", listOf("$subDirName${File.separator}${File.separator}${File.separator}"), ctx)
+            CommandCD().execute("cd", listOf("..${File.separator}"), ctx)
+            return@testCommand rv
+        }
+        assertEquals(filesInSubDir.sortedBy { it.lowercase() }, result.lines())
     }
 }
