@@ -16,7 +16,7 @@ class ExternalCommand : ICommand {
         try {
             val process =
                 ProcessBuilder(cmd).apply {
-                    directory(ctx.shell.workingDirectoryAbsolutePath.toFile())
+                    directory(ctx.shell.workingDirectory.toFile())
                     redirectError(ProcessBuilder.Redirect.INHERIT)
                     if (ctx.input == System.`in`) {
                         redirectInput(ProcessBuilder.Redirect.INHERIT)

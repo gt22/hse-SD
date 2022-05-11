@@ -5,7 +5,7 @@ import com.hse.command.builtin.*
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Path
-import java.nio.file.Paths
+import kotlin.io.path.absolute
 
 /**
  * Основной класс CLI, хранит переменные среды и рабочую директорию
@@ -18,7 +18,7 @@ class Shell(
     val input: InputStream = System.`in`,
     val output: OutputStream = System.out
 ) {
-    val environment: MutableMap<String, String> = mutableMapOf()
+    val environment: MutableMap<String, String> = System.getenv().toMutableMap()
     private val parser = Parser(this, builtinCommands)
 
     private fun execute(line: String): Int {
@@ -33,7 +33,7 @@ class Shell(
             command.execute(ctx)
         } catch (e: ExitException) {
             throw e
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace() //TODO: Better logging?
             255
         }
@@ -57,11 +57,14 @@ class Shell(
         }
     }
 
-    val workingDirectoryAbsolutePath: Path = Paths.get("").toAbsolutePath()
+    var workingDirectory: Path = Path.of(".").absolute().normalize()
+        set(newPath) {
+            field = newPath.absolute().normalize()
+        }
 
     /**
      * Возвращает путь с учётом рабочей директории
      * Не изменяет абсолютные пути
      */
-    fun resolvePath(path: Path): Path = if (path.isAbsolute) path else workingDirectoryAbsolutePath.resolve(path)
+    fun resolvePath(path: Path): Path = if (path.isAbsolute) path else workingDirectory.resolve(path)
 }

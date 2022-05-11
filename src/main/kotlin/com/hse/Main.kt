@@ -11,7 +11,10 @@ fun main() {
             CommandExit(),
             CommandPWD(),
             CommandWC(),
-            CommandSetEnviron()
+            CommandGrep(),
+            CommandSetEnviron(),
+            CommandCD(),
+            CommandLS()
         )
     )
     ctx.startShell()
