@@ -13,7 +13,7 @@ internal class CommandCDTest {
     fun `cd empty`() {
         val result = testCommand { ctx ->
             val rv = CommandCD().execute("cd", emptyList(), ctx)
-            assertEquals(Path.of(System.getProperty("user.home")), ctx.shell.workingDirectoryAbsolutePath)
+            assertEquals(Path.of(System.getProperty("user.home")), ctx.shell.workingDirectory)
             return@testCommand rv
         }
         assertEquals("", result)
@@ -23,7 +23,7 @@ internal class CommandCDTest {
     fun `cd backward`() {
         val result = testCommand { ctx ->
             val rv = CommandCD().execute("cd", listOf(".."), ctx)
-            assertEquals(Path.of(".").absolute().normalize().parent, ctx.shell.workingDirectoryAbsolutePath)
+            assertEquals(Path.of(".").absolute().normalize().parent, ctx.shell.workingDirectory)
             return@testCommand rv
         }
         assertEquals("", result)
@@ -34,7 +34,7 @@ internal class CommandCDTest {
         val subdirectory = File(".").listFiles(File::isDirectory)?.get(0)!!
         val result = testCommand { ctx ->
             val rv = CommandCD().execute("cd", listOf(subdirectory.name), ctx)
-            assertEquals(Path.of(subdirectory.path).absolute().normalize(), ctx.shell.workingDirectoryAbsolutePath)
+            assertEquals(Path.of(subdirectory.path).absolute().normalize(), ctx.shell.workingDirectory)
             return@testCommand rv
         }
         assertEquals("", result)
@@ -46,7 +46,7 @@ internal class CommandCDTest {
         val pwdBefore = testCommand(shell) { ctx ->
             ExternalCommand().execute("pwd", emptyList(), ctx)
         }
-        assertEquals(shell.workingDirectoryAbsolutePath, Path.of(pwdBefore))
+        assertEquals(shell.workingDirectory, Path.of(pwdBefore))
         val cdResult = testCommand(shell) { ctx ->
             CommandCD().execute("cd", listOf(".."), ctx)
         }
@@ -54,6 +54,6 @@ internal class CommandCDTest {
         val pwdAfter = testCommand(shell) { ctx ->
             ExternalCommand().execute("pwd", emptyList(), ctx)
         }
-        assertEquals(shell.workingDirectoryAbsolutePath, Path.of(pwdAfter))
+        assertEquals(shell.workingDirectory, Path.of(pwdAfter))
     }
 }

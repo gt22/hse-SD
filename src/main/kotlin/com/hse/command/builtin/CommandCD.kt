@@ -17,12 +17,12 @@ class CommandCD : SimpleCommand("cd") {
             return 1
         }
         val diffPath = Path.of(arguments.firstOrNull() ?: System.getProperty("user.home"))
-        val newPath = ctx.shell.workingDirectoryAbsolutePath.resolve(diffPath)
+        val newPath = ctx.shell.workingDirectory.resolve(diffPath)
         if (!newPath.isDirectory()) {
             ctx.writer.println("cd: $diffPath: No such directory")
             return 1
         }
-        ctx.shell.workingDirectoryAbsolutePath = newPath
+        ctx.shell.workingDirectory = newPath
         return 0
     }
 }

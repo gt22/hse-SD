@@ -21,10 +21,6 @@ class Shell(
     val environment: MutableMap<String, String> = System.getenv().toMutableMap()
     private val parser = Parser(this, builtinCommands)
 
-    init {
-        environment[KEY_WD] = Path.of(environment[KEY_WD] ?: ".").absolute().normalize().toString()
-    }
-
     private fun execute(line: String): Int {
         val command = try {
             parser.parseWithSubstitution(line) ?: return 0
@@ -61,19 +57,14 @@ class Shell(
         }
     }
 
-    var workingDirectoryAbsolutePath: Path
-        get() = Path.of(environment[KEY_WD]!!)
+    var workingDirectory: Path = Path.of(".").absolute().normalize()
         set(newPath) {
-            environment[KEY_WD] = newPath.absolute().normalize().toString()
+            field = newPath.absolute().normalize()
         }
 
     /**
      * Возвращает путь с учётом рабочей директории
      * Не изменяет абсолютные пути
      */
-    fun resolvePath(path: Path): Path = if (path.isAbsolute) path else workingDirectoryAbsolutePath.resolve(path)
-
-    companion object {
-        private const val KEY_WD = "PWD"
-    }
+    fun resolvePath(path: Path): Path = if (path.isAbsolute) path else workingDirectory.resolve(path)
 }
