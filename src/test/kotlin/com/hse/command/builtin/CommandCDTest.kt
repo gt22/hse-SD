@@ -56,4 +56,15 @@ internal class CommandCDTest {
         }
         assertEquals(shell.workingDirectory, Path.of(pwdAfter))
     }
+
+    @Test
+    fun `cd absolute`() {
+        val subdirectory = File(".").listFiles(File::isDirectory)?.get(0)!!
+        val result = testCommand { ctx ->
+            val rv = CommandCD().execute("cd", listOf(subdirectory.absolutePath), ctx)
+            assertEquals(Path.of(subdirectory.path).absolute().normalize(), ctx.shell.workingDirectory)
+            return@testCommand rv
+        }
+        assertEquals("", result)
+    }
 }
