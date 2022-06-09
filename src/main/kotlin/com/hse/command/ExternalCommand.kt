@@ -23,7 +23,7 @@ class ExternalCommand : ICommand {
                     }
                     environment().putAll(ctx.shell.environment)
                 }.start()
-            if(ctx.input != System.`in`) {
+            if (ctx.input != System.`in`) {
                 try {
                     ctx.input.transferTo(process.outputStream)
                     process.outputStream.close()
