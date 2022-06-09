@@ -30,14 +30,17 @@ class CommandGrep : SimpleCommand("grep") {
         } else {
             ctx.reader.readLines()
         }
-
+        var maxPrinted = -1
         lines.forEachIndexed { index, line ->
+            if (index <= maxPrinted) return@forEachIndexed
+
             val match = toFindRegex.find(line)
             if (match == null || (wordRegexp && notConstituent(line, match))) {
                 return@forEachIndexed
             }
             var currentIndex = index
             while (currentIndex < lines.size && currentIndex <= index + afterContext) {
+                maxPrinted = currentIndex
                 ctx.writer.println(lines[currentIndex++])
             }
         }
