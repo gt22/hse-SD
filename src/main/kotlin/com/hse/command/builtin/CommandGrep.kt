@@ -9,6 +9,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
 import com.hse.CommandContext
 import com.hse.command.SimpleCommand
+import java.lang.Integer.max
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -30,18 +31,15 @@ class CommandGrep : SimpleCommand("grep") {
         } else {
             ctx.reader.readLines()
         }
-        var maxPrinted = -1
+        var maxtoPrint = -1
         lines.forEachIndexed { index, line ->
-            if (index <= maxPrinted) return@forEachIndexed
-
-            val match = toFindRegex.find(line)
-            if (match == null || (wordRegexp && notConstituent(line, match))) {
-                return@forEachIndexed
+            toFindRegex.find(line)?.let {
+                if (!(wordRegexp && notConstituent(line, it))) {
+                    maxtoPrint = max(maxtoPrint, index + afterContext)
+                }
             }
-            var currentIndex = index
-            while (currentIndex < lines.size && currentIndex <= index + afterContext) {
-                maxPrinted = currentIndex
-                ctx.writer.println(lines[currentIndex++])
+            if (index <= maxtoPrint) {
+                ctx.writer.println(lines[index])
             }
         }
 
