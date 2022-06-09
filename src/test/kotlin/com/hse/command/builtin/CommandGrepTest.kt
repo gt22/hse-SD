@@ -20,4 +20,14 @@ internal class CommandGrepTest {
         }
         assertEquals(text, result)
     }
+
+    @org.junit.jupiter.api.Test
+    fun `test -w flag`() {
+        val result = testCommand(javaClass.getResourceAsStream("/testW")!!) { ctx ->
+            CommandGrep().execute("grep", listOf("23", "-w"), ctx)
+        }
+        assertEquals("23\n" +
+                "23!\n" +
+                "!23", result)
+    }
 }

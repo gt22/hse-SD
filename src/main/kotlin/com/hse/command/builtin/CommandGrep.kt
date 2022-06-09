@@ -34,7 +34,7 @@ class CommandGrep : SimpleCommand("grep") {
         var maxtoPrint = -1
         lines.forEachIndexed { index, line ->
             toFindRegex.find(line)?.let {
-                if (!(wordRegexp && notConstituent(line, it))) {
+                if (!wordRegexp || (wordRegexp && notConstituent(line, it))) {
                     maxtoPrint = max(maxtoPrint, index + afterContext)
                 }
             }
