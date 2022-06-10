@@ -14,6 +14,7 @@ import com.hse.command.SimpleCommand
 import java.lang.Integer.max
 import java.nio.file.Files
 import java.nio.file.Paths
+import kotlin.streams.asSequence
 
 class CommandGrep : SimpleCommand("grep") {
     override fun execute(arguments: List<String>, ctx: CommandContext): Int {
@@ -33,10 +34,11 @@ class CommandGrep : SimpleCommand("grep") {
 
         val lines = if (filename != null) {
             val file = ctx.shell.resolvePath(Paths.get(filename))
-            Files.readAllLines(file)
+            Files.lines(file)
         } else {
-            ctx.reader.readLines()
-        }
+            ctx.reader.lines()
+        }.asSequence()
+
         var maxtoPrint = -1
         lines.forEachIndexed { index, line ->
             toFindRegex.find(line)?.let {
@@ -45,7 +47,7 @@ class CommandGrep : SimpleCommand("grep") {
                 }
             }
             if (index <= maxtoPrint) {
-                ctx.writer.println(lines[index])
+                ctx.writer.println(line)
             }
         }
 
