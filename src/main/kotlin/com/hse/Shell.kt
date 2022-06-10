@@ -1,7 +1,7 @@
 package com.hse
 
 import com.hse.command.ICommand
-import com.hse.command.builtin.*
+import com.hse.command.builtin.ExitException
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.NoSuchFileException
@@ -22,8 +22,8 @@ class Shell(
     val environment: MutableMap<String, String> = mutableMapOf()
     private val parser = Parser(this, builtinCommands)
 
-    private fun execute(line: String): Int {
-        val command = try {
+    private fun executeLine(line: String): Int {
+        val commandPipeline = try {
             parser.parseWithSubstitution(line) ?: return 0
         } catch (e: IllegalArgumentException) {
             output.write("Parse error: ${e.message}\n".toByteArray())
@@ -31,7 +31,7 @@ class Shell(
         }
         val ctx = CommandContext(this, input, output)
         return try {
-            command.execute(ctx)
+            commandPipeline.execute(ctx)
         } catch (e: ExitException) {
             throw e
         } catch (e: java.lang.IllegalArgumentException) {
@@ -55,7 +55,7 @@ class Shell(
                 output.write("> ".toByteArray())
                 val line = reader.readLine() ?: break
                 try {
-                    execute(line)
+                    executeLine(line)
                 } catch (_: ExitException) {
                     break
                 } catch (e: Throwable) {
