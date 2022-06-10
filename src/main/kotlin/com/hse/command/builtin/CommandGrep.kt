@@ -18,40 +18,47 @@ import kotlin.streams.asSequence
 
 class CommandGrep : SimpleCommand("grep") {
     override fun execute(arguments: List<String>, ctx: CommandContext): Int {
+        val (pattern, filename, ignoreCase, wordRegexp, afterContext) = parseArgs(arguments)
+        val toFindRegex = getRegex(pattern, ignoreCase)
+
+        var maxToPrint = -1
+        getLines(filename, ctx).forEachIndexed { index, line ->
+            if (findByRegex(toFindRegex, line, wordRegexp)) {
+                maxToPrint = max(maxToPrint, index + afterContext)
+            }
+            if (index <= maxToPrint) {
+                ctx.writer.println(line)
+            }
+        }
+
+        return 0
+    }
+
+    private fun findByRegex(toFindRegex: Regex, line: String, wordRegexp: Boolean): Boolean {
+        return toFindRegex.find(line)?.let { !wordRegexp || (wordRegexp && notConstituent(line, it)) } == true
+    }
+
+    private fun getLines(filename: String?, ctx: CommandContext) = if (filename != null) {
+        val file = ctx.shell.resolvePath(Paths.get(filename))
+        Files.lines(file)
+    } else {
+        ctx.reader.lines()
+    }.asSequence()
+
+    private fun getRegex(pattern: String, ignoreCase: Boolean) = pattern.toRegex(
+        if (ignoreCase) {
+            setOf(RegexOption.IGNORE_CASE)
+        } else emptySet()
+    )
+
+    private fun parseArgs(arguments: List<String>): ParsedArguments {
         val argumentsParser = ArgumentsParser()
         try {
             argumentsParser.parse(arguments)
         } catch (e: CliktError) {
             throw IllegalArgumentException(e.message)
         }
-        val (pattern, filename, ignoreCase, wordRegexp, afterContext) = argumentsParser.grepArguments()
-
-        val toFindRegex = pattern.toRegex(
-            if (ignoreCase) {
-                setOf(RegexOption.IGNORE_CASE)
-            } else emptySet()
-        )
-
-        val lines = if (filename != null) {
-            val file = ctx.shell.resolvePath(Paths.get(filename))
-            Files.lines(file)
-        } else {
-            ctx.reader.lines()
-        }.asSequence()
-
-        var maxtoPrint = -1
-        lines.forEachIndexed { index, line ->
-            toFindRegex.find(line)?.let {
-                if (!wordRegexp || (wordRegexp && notConstituent(line, it))) {
-                    maxtoPrint = max(maxtoPrint, index + afterContext)
-                }
-            }
-            if (index <= maxtoPrint) {
-                ctx.writer.println(line)
-            }
-        }
-
-        return 0
+        return argumentsParser.grepArguments()
     }
 
     private fun notConstituent(input: String, match: MatchResult): Boolean {
