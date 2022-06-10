@@ -16,7 +16,18 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.streams.asSequence
 
+/**
+ * grep searches for patterns in file (or input stream), prints each line that matches a pattern
+ *
+ * OPTIONS:
+ * * `-i` — ignore case
+ * * `-w`(word regexp) — Select only those lines containing matches that form  whole words
+ * * `-A NUM` (after context) — Print NUM lines of trailing context after matching  line
+ */
 class CommandGrep : SimpleCommand("grep") {
+    /**
+     * arguments: pattern [file name] [flags with values]
+     */
     override fun execute(arguments: List<String>, ctx: CommandContext): Int {
         val (pattern, filename, ignoreCase, wordRegexp, afterContext) = parseArgs(arguments)
         val toFindRegex = getRegex(pattern, ignoreCase)
