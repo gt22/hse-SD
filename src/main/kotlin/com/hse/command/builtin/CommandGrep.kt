@@ -1,8 +1,10 @@
 package com.hse.command.builtin
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.optional
+import com.github.ajalt.clikt.parameters.options.check
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
@@ -16,7 +18,11 @@ import java.nio.file.Paths
 class CommandGrep : SimpleCommand("grep") {
     override fun execute(arguments: List<String>, ctx: CommandContext): Int {
         val argumentsParser = ArgumentsParser()
-        argumentsParser.main(arguments)
+        try {
+            argumentsParser.parse(arguments)
+        } catch (e: CliktError) {
+            throw IllegalArgumentException(e.message)
+        }
         val (pattern, filename, ignoreCase, wordRegexp, afterContext) = argumentsParser.grepArguments()
 
         val toFindRegex = pattern.toRegex(
@@ -66,6 +72,7 @@ private class ArgumentsParser : CliktCommand() {
     private val ignoreCase by option("-i").flag()
     private val wordRegexp by option("-w").flag()
     private val afterContext by option("-A").int().default(0)
+        .check("Should be a non-negative integer") { it >= 0 }
     private val pattern by argument()
     private val filename by argument().optional()
 

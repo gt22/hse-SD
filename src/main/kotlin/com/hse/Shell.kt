@@ -4,6 +4,7 @@ import com.hse.command.ICommand
 import com.hse.command.builtin.*
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -33,7 +34,13 @@ class Shell(
             command.execute(ctx)
         } catch (e: ExitException) {
             throw e
-        } catch(e: Exception) {
+        } catch (e: java.lang.IllegalArgumentException) {
+            output.write("Invalid argument: ${e.message} \n".toByteArray())
+            253
+        }catch (e: NoSuchFileException) {
+            output.write("Error: No such file or directory: ${e.message} \n".toByteArray())
+            254
+        } catch (e: Exception) {
             e.printStackTrace() //TODO: Better logging?
             255
         }
@@ -45,6 +52,7 @@ class Shell(
     fun startShell() {
         input.bufferedReader().use { reader ->
             while (true) {
+                output.write("> ".toByteArray())
                 val line = reader.readLine() ?: break
                 try {
                     execute(line)
