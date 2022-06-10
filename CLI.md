@@ -89,8 +89,25 @@
 Реализация `match` - проверяем что первый элемент совпадает с названием команды
 
 ### CommandGrep
-Для парсинга аргументов командной строки использована библиотека [Clikt](https://ajalt.github.io/clikt/), т.к. это одна из самых простой в использовании и самых популярных для этого библиотек
+* grep ищет шаблоны (regex) в файле (или входном потоке), печатает каждую строку, соответствующую шаблону
+* Ключи:
+  * `-i` — игнорировать регистр
+  * `-w`(word regexp) — выбирает только те строки, которые содержат совпадения, образующие целые слова.
+  * `-A NUM` (после контекста) — вывести NUM строк после совпадения.
+* Разбор ключей CLI
+  Библиотеки для разбора ключей CLI:
+  * [Clikt](https://ajalt.github.io/clikt/)
+  * [kotlin-argparser](https://github.com/xenomachina/kotlin-argparser)
+  * [kotlinx-cli](https://github.com/Kotlin/kotlinx-cli)
+  * [Apache-cli](https://commons.apache.org/proper/commons-cli/)
+  * [jcommander](http://jcommander.org/)
+  * [picocli](https://picocli.info/)
 
+  Выбрана Clikt, т.к.:
+  * `kotlin-argparser` не поддерживается.
+  * `kotlinx-cli` все еще на стадии experimental
+  * `jcommander`, `picocli` используют аннотации, не такая удобная работа с типами, как в библиотеках для kotlin
+  * Библиотеки для Java неудобные, нужно писать много лишнего кода
 
 ## CommandSetEnviron
 Команда вида `x=y`, устанавливающая переменные среды
