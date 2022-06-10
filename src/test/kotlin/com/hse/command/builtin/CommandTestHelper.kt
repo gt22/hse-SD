@@ -2,6 +2,7 @@ package com.hse.command.builtin
 
 import com.hse.CommandContext
 import com.hse.Shell
+import com.hse.command.ExternalCommand
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -15,6 +16,16 @@ fun testCommand(input: InputStream, expectedExitCode: Int = 0, act: (CommandCont
             return output.toString().removeSuffix(System.lineSeparator())
         }
     }
+}
+
+fun testCompareWithExternal(command: String, arguments: List<String>, getStream: () -> InputStream) {
+    val expected = testCommand(getStream()) { ctx ->
+        ExternalCommand().execute(command, arguments, ctx)
+    }
+    val result = testCommand(getStream()) { ctx ->
+        CommandGrep().execute(command, arguments, ctx)
+    }
+    assertEquals(expected, result)
 }
 
 val ln = System.lineSeparator()

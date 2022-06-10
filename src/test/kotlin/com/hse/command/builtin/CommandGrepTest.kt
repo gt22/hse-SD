@@ -1,33 +1,31 @@
 package com.hse.command.builtin
 
-import org.junit.jupiter.api.Assertions.*
-import java.nio.charset.StandardCharsets.UTF_8
+import java.io.InputStream
 
 internal class CommandGrepTest {
     @org.junit.jupiter.api.Test
     fun execute() {
-        val result = testCommand(javaClass.getResourceAsStream("/testFile.txt")!!) { ctx ->
-            CommandGrep().execute("grep", listOf("1"), ctx)
-        }
-        assertEquals("1 2", result)
+        testCompareWithExternal(listOf("1")) { getStream("/testFile.txt") }
     }
 
     @org.junit.jupiter.api.Test
     fun `test afterContext flag`() {
-        val text = javaClass.getResourceAsStream("/test")!!.readAllBytes().toString(UTF_8)
-        val result = testCommand(javaClass.getResourceAsStream("/test")!!) { ctx ->
-            CommandGrep().execute("grep", listOf("1", "-A", "3"), ctx)
-        }
-        assertEquals(text, result)
+        testCompareWithExternal(listOf("1", "-A", "3")) { getStream("/test") }
     }
 
     @org.junit.jupiter.api.Test
     fun `test -w flag`() {
-        val result = testCommand(javaClass.getResourceAsStream("/testW")!!) { ctx ->
-            CommandGrep().execute("grep", listOf("23", "-w"), ctx)
-        }
-        assertEquals("23\n" +
-                "23!\n" +
-                "!23", result)
+        testCompareWithExternal(listOf("23", "-w")) { getStream("/testW") }
     }
+    @org.junit.jupiter.api.Test
+    fun `test without -w flag`() {
+        testCompareWithExternal(listOf("23")) { getStream("/testW") }
+    }
+
+
+    private fun testCompareWithExternal(arguments: List<String>, getStream: () -> InputStream) {
+        testCompareWithExternal("grep", arguments, getStream)
+    }
+
+    private fun getStream(file: String) = javaClass.getResourceAsStream(file)!!
 }
